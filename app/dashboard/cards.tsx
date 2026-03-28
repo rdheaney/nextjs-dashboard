@@ -1,5 +1,6 @@
 // ...
 import { fetchCardData } from '@/app/lib/data';
+import { Card } from '@/app/ui/dashboard/cards';
  
 // ...
  

@@ -45,12 +45,31 @@ async function seedInvoices() {
     );
   `;
 
+  // Keep a single row for duplicate seeded invoice shapes from earlier runs.
+  await sql`
+    WITH ranked AS (
+      SELECT
+        id,
+        ROW_NUMBER() OVER (
+          PARTITION BY customer_id, amount, status, date
+          ORDER BY id
+        ) AS rn
+      FROM invoices
+    )
+    DELETE FROM invoices
+    WHERE id IN (SELECT id FROM ranked WHERE rn > 1);
+  `;
+
   const insertedInvoices = await Promise.all(
     invoices.map(
       (invoice) => sql`
-        INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date})
-        ON CONFLICT (id) DO NOTHING;
+        INSERT INTO invoices (id, customer_id, amount, status, date)
+        VALUES (${invoice.id}, ${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date})
+        ON CONFLICT (id) DO UPDATE
+        SET customer_id = EXCLUDED.customer_id,
+            amount = EXCLUDED.amount,
+            status = EXCLUDED.status,
+            date = EXCLUDED.date;
       `,
     ),
   );

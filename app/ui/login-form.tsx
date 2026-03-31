@@ -25,6 +25,9 @@ export default function LoginForm() {
         <h1 className={`${lusitana.className} mb-3 text-2xl`}>
           Please log in to continue.
         </h1>
+        <p className="mb-4 rounded-md border border-purple-200 bg-purple-50 px-3 py-2 text-xs text-purple-900">
+          Demo login: 3v1lR4bb1t@hotmail.com / C4rr0ts
+        </p>
         <div className="w-full">
           <div>
             <label
